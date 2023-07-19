@@ -1,0 +1,84 @@
+\documentclass[\VAR[config.fontsize], \VAR[config.paper_size] ]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{xcolor}
+\definecolor{codegray}{gray}{0.9}
+{% raw %}
+\newcommand{\code}[1]{\texttt{#1}}
+{% endraw %}
+\author{PG 625: Entwicklung automatischer Tools zur Lösung von CTFs}
+\title{pinaht CTF Report}
+\begin{document}
+    \maketitle
+    \tableofcontents
+
+    \section{General Information}
+        This is a auto-generated analysis of the target system%
+        {%- if info.network is not none %}
+        , with IP-address \VAR[info.network],~%
+        {%- else %}
+        ~%
+        {%- endif %}
+        created by pinaht.
+        his report does not claim to be complete,  nor does it ensure security in any way.
+        Nevertheless may it contain useful information to find designated weaknesses in the target system.
+
+        Pinaht and thus this report is the product of a project group task of the Technische 
+        Universität Dortmund Germany at chair fourteen.
+
+        
+
+        Date: \VAR[info.date] (DD:MM:YYYY)\\
+        Duration of execution: \VAR[info.duration]
+    \section{Flags}
+
+    {%- for flag in structured_flags %}
+        \subsection{ \VAR[flag.name] }
+            {%- if flag.success %}
+            The Flag was successfully achieved!\\
+            \begin{figure}[t]
+                \begin{center}
+                    \includegraphics[width=0.98\textwidth, angle = 0]{\VAR[flag.path]}
+                \end{center}
+                \caption{The execution path of the \VAR[flag.name] flag.}
+            \end{figure}
+            {%- else %}
+            The Flag was not achieved!\\
+            {%- endif %}
+            \VAR[flag.description]\\
+            {%- if flag.success %}
+                The Flag can be achieved by following the steps:\\
+                {%- for module in flag.modules %}
+                \subsubsection{ \VAR[module.name] }
+                    \textbf{Duration}\\
+                    \VAR[module.duration]\\\\
+                    {%- if module.requirements %}
+                    \textbf{Requirements}\\
+                    \begin{tabular}{ll}
+                        \multicolumn{2}{c}{} \\
+                        \hline
+                        knowledge & source \\
+                        \hline
+                        {%- for requirement in module.requirements %}
+                        \hline
+                        \VAR[requirement.knowledge] & \VAR[requirement.source] \\
+                        {%- endfor %}
+                    \end{tabular}\\\\
+                    {%- endif %}
+                    {%- if module.execution %}
+                    \textbf{Execution}\\
+                    \begin{enumerate}
+                    {%- for step in module.execution %}
+                        \item \VAR[step]
+                    {%- endfor %}
+                    \end{enumerate}
+                    {%- endif %}
+                {%- endfor %}
+            {%- endif %}
+    {%- endfor %}
+
+\end{document}

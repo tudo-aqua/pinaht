@@ -1,0 +1,12 @@
+numpy
+python-libnmap
+netifaces
+Jinja2
+graphviz
+PyYAML
+paramiko
+pexpect
+pyyaml
+latex
+requests
+beautifulsoup4

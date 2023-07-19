@@ -1,0 +1,13 @@
+__pycache__/
+.env/
+.idea/
+.vscode/
+*.gv
+*.gv.pdf
+*.pdf
+doc/build/
+
+doc/source/generated_rst/
+
+reports/
+

@@ -1,0 +1,18 @@
+digraph G {
+    {%- for key, value in config.items() %}
+    {{key}} [{{value}}]
+    {%- endfor %}
+
+    {%- for s, t, pre in edges %}
+    {{s}} -> {{t}} [label="{{pre}}"];
+    {%- endfor %}
+
+    {%- for id, name, meta_pre, type in nodes %}
+    {%- if type == "MODULE"%}
+    {{id}} [label=<<table><tr><td balign="center"><b>{{name}}</b></td></tr><tr><td balign="left"><font face="Liberation Mono"><i>{{meta_pre}}</i></font></td></tr></table>>, shape=box, style=filled, color="#75abfc"];
+    {%- endif %}
+    {%- if type == "FLAG"%}
+    {{id}} [label=<<table><tr><td balign="center"><b>{{name}}</b></td></tr><tr><td balign="left"><font face="Liberation Mono"><i>{{meta_pre}}</i></font></td></tr></table>>, shape=box, style=filled, color="#FCC675"];
+    {%- endif %}
+    {%- endfor %}
+}

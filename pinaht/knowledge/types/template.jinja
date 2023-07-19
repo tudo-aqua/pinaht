@@ -1,0 +1,95 @@
+{{ generalinfo["licence_text"] }}
+
+from {{ generalinfo["import_prefix"] }}.knowledge import Knowledge{% if typeinfo["kind"] == "LEAF_ENUM" %}, KnowledgeEnumMeta{% endif %} # noqa F401
+{% if typeinfo["kind"] == "LEAF_ENUM" %}
+from enum import Enum
+{% endif %}
+{% for cimport in classinfo["imports"] %}
+from {{ cimport[0] }} import {{ cimport[1] }}
+{% endfor %}
+{% for extraimport in typeinfo["extraimports"] %}
+{{ extraimport }}
+{% endfor %}
+
+class {{ typeinfo["name"] }}({% for meta in classinfo["metaclasses"] %}{% if loop.index == 1 %}{{ meta }}{% else %}, {{ meta }}{% endif %}{% endfor %}{% if typeinfo["kind"] == "LEAF_ENUM" %}, metaclass=KnowledgeEnumMeta{% endif %}):
+    """
+    {{ typeinfo["description"] }}
+    """
+{% if typeinfo["kind"] == "LEAF_ENUM" %}
+{% for enumeration in typeinfo["enum"] %}
+    {{ enumeration }} = {{ loop.index }}
+{% endfor %}
+{% endif %}
+{% if typeinfo["kind"] == "LEAF_EXTENDS" %}
+    def __new__(cls, *args, **kwargs):
+        return super({{ typeinfo["name"] }}, cls).__new__(cls, args[0])
+{% endif %}
+    def __init__(self, *args, **kwargs):
+        """
+        Constructor of the class {{ typeinfo["name"] }}.
+        """
+
+        super().__init__()
+        self.init_{{ typeinfo["name"]|lower }}(*args)
+{% if not typeinfo["kind"] == "ABSTRACT" %}
+{% for child_attr in typeinfo["childs"] %}
+        self.{{ child_attr["name"] }} = []
+{% endfor %}
+{% endif %}
+        self.type = "{{typeinfo["kind"]}}"
+        self.lookup = { {% for child_attr in typeinfo["childs"] %}"{{ child_attr["name"] }}": self.{{ child_attr["name"] }}, {% endfor %}}
+
+        for key, item in kwargs.items():
+            if isinstance(item, list):
+                for element in item:
+                    self.add_child(key, element)
+            else:
+                self.add_child(key, item)
+
+{% if typeinfo["kind"] == "BRANCH"%}
+    def __str__(self):
+        return self.__class__.__name__
+{% endif %}
+{% if typeinfo["kind"] == "LEAF_ENUM"%}
+    def __str__(self):
+        return self.name
+{% endif %}
+
+{% if typeinfo["kind"] == "LEAF_ENUM" or typeinfo["kind"] == "LEAF_EXTENDS" %}
+    def fuzzy_eq(self, other) -> float:
+        if type(self) == type(other):
+            if self == other:
+                return 1.0
+        return 0.0
+{% else %}
+    def fuzzy_eq(self, other) -> float:
+        # TODO
+        if id(self) == id(other):
+            return 1.0
+        if not type(self) == type(other):
+            return 0.0
+        return 0.5
+{% endif %}
+
+    def add_child(self, key, child):
+        if key not in self.lookup:
+            raise ValueError(f"Type '{{ typeinfo["name"] }}' has no child/attribute with name {key}. "\
+                  "Check types.yaml or the generated PDF for correct identifiers.")
+{% for child_attr in typeinfo["childs"] %}
+{% if loop.index == 1 %}
+        if key == "{{ child_attr["name"] }}" and isinstance(child, {{ child_attr["classname"] }}):
+            self.{{ child_attr["name"] }}.append(child)
+            child.parent = self
+{% else %}
+        elif key == "{{ child_attr["name"] }}" and isinstance(child, {{ child_attr["classname"] }}):
+            self.{{ child_attr["name"] }}.append(child)
+            child.parent = self
+{% endif %}
+{% endfor %}
+        else:
+            raise TypeError(f"Child for attribute {key} is not of the right type")
+        
+    def init_{{ typeinfo["name"]|lower }}(self, *args): # noqa F811
+        pass
+
+

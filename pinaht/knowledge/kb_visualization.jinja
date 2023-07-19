@@ -1,0 +1,28 @@
+digraph G {
+
+	graph [nodesep="1", ranksep="1"];
+	node [fontname="{{ style["node_label_fontname"] }}",fontcolor="{{ style["node_label_fontcolor"] }}",fontsize="{{ style["node_label_fontsize"] }}"];
+	edge [fontname="{{ style["edge_label_fontname"] }}",fontcolor="{{ style["edge_label_fontcolor"] }}",fontsize="{{ style["edge_label_fontsize"] }}"];
+
+{% for edge in edges %}
+	{{ edge[0] }} -> {{ edge[1] }} [label="  {{ edge[2] }}  "];
+{% endfor %}
+
+{% for node in nodes %}
+{% if node[1] == "LEAF_EXTENDS" %}
+    {{ node[0] }} [label=<<table><tr><td balign="center"><b>{{ node[2] }}</b></td></tr><tr><td balign="left"><font face="{{ style["node_content_fontname"] }}"><i>{{ node[3] }}</i></font></td></tr></table>>, shape={{ style["leaf_shape"] }}, style=filled, color="{{ style["leaf_extends_color"] }}"];
+{% endif %}
+{% if node[1] == "LEAF_ENUM" %}
+	{{ node[0] }} [label=<<table><tr><td balign="center"><b>{{ node[2] }}</b></td></tr><tr><td balign="left"><font face="{{ style["node_content_fontname"] }}"><i>{{ node[3] }}</i></font></td></tr></table>>, shape={{ style["leaf_shape"] }}, style=filled, color="{{ style["leaf_enum_color"] }}"];
+{% endif %}
+{% if node[1] == "LEAF_CUSTOM" %}
+	{{ node[0] }} [label=<<table><tr><td balign="center"><b>{{ node[2] }}</b></td></tr><tr><td balign="left"><font face="{{ style["node_content_fontname"] }}"><i>{{ node[3] }}</i></font></td></tr></table>>, shape={{ style["leaf_shape"] }}, style=filled, color="{{ style["leaf_custom_color"] }}"];
+{% endif %}
+{% if node[1] == "BRANCH" %}
+	{{ node[0] }} [label=<<b>{{ node[2] }}</b>>, shape={{ style["branch_shape"] }}, style=filled, color="{{ style["branch_color"] }}"];
+{% endif %}
+{% if node[1] == "INTER" %}
+	{{ node[0] }} [label=<<b>{{ node[2] }}</b>>, shape={{ style["inter_shape"] }}, style=filled, color="{{ style["inter_color"] }}"];
+{% endif %}
+{% endfor %}
+}
